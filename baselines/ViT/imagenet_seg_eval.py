@@ -64,7 +64,7 @@ parser.add_argument('--train_dataset', type=str, default='imagenet', metavar='N'
 parser.add_argument('--method', type=str,
                     default='grad_rollout',
                     choices=[ 'rollout', 'lrp','transformer_attribution', 'full_lrp', 'lrp_last_layer',
-                              'attn_last_layer', 'attn_gradcam'],
+                              'attn_last_layer', 'attn_gradcam', 'mm', 'ours'],
                     help='')
 parser.add_argument('--thr', type=float, default=0.,
                     help='threshold')
@@ -208,6 +208,12 @@ def eval_batch(image, labels, evaluator, index):
     # segmentation test for the GradCam baseline (last attn layer)
     elif args.method == 'attn_gradcam':
         Res = baselines.generate_cam_attn(image.cuda()).reshape(batch_size, 1, 14, 14)
+
+    elif args.method == 'mm':
+        Res = baselines.generate_relevance(image.cuda()).reshape(batch_size, 1, 14, 14)
+
+    elif args.method == 'ours':
+        Res = baselines.our_generate_relevance(image.cuda()).reshape(batch_size, 1, 14, 14)
 
     if args.method != 'full_lrp':
         # interpolate to full image size (224,224)
